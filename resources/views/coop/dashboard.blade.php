@@ -484,6 +484,157 @@
               </form>
           </div>
 
+          {{-- SECTION: Perbandingan Aset vs Beban --}}
+<div class="card">
+    <h3 class="font-bold text-lg mb-4">Perbandingan Aset vs Beban</h3>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {{-- Form Inputs --}}
+      <div class="lg:col-span-1 space-y-3">
+        <div>
+          <label class="text-xs text-slate-500">Aset (Rp)</label>
+          <input id="inpAset"  type="number" … value="{{ $compare_avb['assets'] ?? ($composition['assets'] ?? 0) }}">
+        </div>
+        <div>
+          <label class="text-xs text-slate-500">Beban (Rp)</label>
+          <input id="inpBeban" type="number" … value="{{ $compare_avb['expenses'] ?? array_sum($line['opex'] ?? []) }}">
+        </div>
+
+        <div class="pt-2">
+          <button id="btnHitung"
+                  class="w-full inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold transition bg-slate-800 text-white hover:bg-slate-900">
+            Hitung & Perbarui Grafik
+          </button>
+        </div>
+      </div>
+
+      {{-- Langkah Perhitungan --}}
+      <div class="lg:col-span-1">
+        <p class="font-semibold mb-2">Langkah perhitungan:</p>
+        <ol class="list-decimal pl-5 space-y-1 text-sm">
+          <li>
+            Aset − Beban =
+            <span id="stepSelisih" class="font-mono"></span>
+          </li>
+          <li>
+            Rasio = (<span id="stepPembilang" class="font-mono"></span> ÷
+            <span id="stepPenyebut" class="font-mono"></span>) × 100%
+          </li>
+          <li>
+            Rasio = <span id="stepAkhir" class="font-mono"></span>
+          </li>
+        </ol>
+
+        <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+          <p class="font-semibold mb-1">✅ Hasil:</p>
+          <p id="hasilTeks"></p>
+        </div>
+      </div>
+
+      {{-- Chart --}}
+      <div class="lg:col-span-1">
+        <div class="chart-container" style="height: 260px;">
+          <canvas id="asetBebanChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const fmtIDR = (n) =>
+        (Number(n) || 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+
+      const $aset   = document.getElementById('inpAset');
+      const $beban  = document.getElementById('inpBeban');
+      const $btn    = document.getElementById('btnHitung');
+
+      const $stepSelisih  = document.getElementById('stepSelisih');
+      const $stepPembilang= document.getElementById('stepPembilang');
+      const $stepPenyebut = document.getElementById('stepPenyebut');
+      const $stepAkhir    = document.getElementById('stepAkhir');
+      const $hasilTeks    = document.getElementById('hasilTeks');
+
+      // Chart setup (hindari warna merah)
+      let abChart;
+      function initChart(aset, beban) {
+        const ctx = document.getElementById('asetBebanChart').getContext('2d');
+        if (abChart) abChart.destroy();
+        abChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Aset', 'Beban'],
+            datasets: [{
+              label: 'Jumlah (Rp)',
+              data: [aset, beban],
+              backgroundColor: [
+                'rgba(16, 185, 129, 0.8)',   // 💚 green-500 (Aset)
+                'rgba(139, 92, 246, 0.8)'    // 💜 violet-500 (Beban)
+              ],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#1e293b',
+                callbacks: {
+                  label: (ctx) => fmtIDR(ctx.parsed.y)
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: '#e5e7eb' },
+                ticks: {
+                  callback: (v) => (v).toLocaleString('id-ID', {
+                    style: 'currency', currency: 'IDR', maximumFractionDigits: 0, notation: 'compact'
+                  })
+                }
+              },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      function hitungDanRender() {
+        const aset  = Number($aset.value || 0);
+        const beban = Number($beban.value || 0);
+
+        const selisih = aset - beban;                       // langkah 1
+        const rasio   = beban > 0 ? (selisih / beban) * 100 : 0;  // langkah 2
+
+        // Update langkah
+        $stepSelisih.textContent   = `${fmtIDR(aset)} − ${fmtIDR(beban)} = ${fmtIDR(selisih)}`;
+        $stepPembilang.textContent = selisih.toLocaleString('id-ID');
+        $stepPenyebut.textContent  = beban.toLocaleString('id-ID');
+        $stepAkhir.textContent     = `${rasio.toFixed(2)}%`;
+
+        // Hasil narasi
+        const kata = rasio >= 0 ? 'lebih tinggi' : 'lebih rendah';
+        $hasilTeks.innerHTML =
+          `Rasio selisih antara <b>Aset</b> dan <b>Beban</b> adalah <b>${rasio.toFixed(2)}%</b>, ` +
+          `artinya <b>Aset ${Math.abs(rasio).toFixed(2)}% ${kata}</b> dibanding Beban.`;
+
+        // Update chart
+        initChart(aset, beban);
+      }
+
+      // Inisialisasi pertama kali
+      hitungDanRender();
+
+      // Re-calc saat klik / ubah input
+      $btn.addEventListener('click', (e) => { e.preventDefault(); hitungDanRender(); });
+      $aset.addEventListener('input', hitungDanRender);
+      $beban.addEventListener('input', hitungDanRender);
+    })();
+    </script>
+
   </div>
 
 

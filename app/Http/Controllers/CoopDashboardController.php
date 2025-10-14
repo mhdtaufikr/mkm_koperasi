@@ -69,6 +69,12 @@ class CoopDashboardController extends Controller
 
     $kondisiKeuangan = $headerCfg->kondisi_keuangan ?? $deriveStatus($ratios);
 
+    // setelah variabel $line, $latestBal, dll dibuat
+$asetDefault  = (int)($latestBal->total_assets ?? 0);
+// Beban YTD pakai total opex dari line chart
+$bebanDefault = (int) collect($line)->sum('opex');
+
+
     // susun payload ke Blade
     $data = [
         'header' => [
@@ -135,6 +141,10 @@ class CoopDashboardController extends Controller
             'liabilities' => (int)($latestBal->total_liabilities ?? 0),
             'equity'      => (int)($latestBal->total_equity ?? 0),
         ],
+        'compare_avb' => [                   // ✅ baru
+        'assets'  => $asetDefault,
+        'expenses'=> $bebanDefault,
+    ],
 
     ];
 
@@ -204,6 +214,10 @@ public function indexView()
 
     $kondisiKeuangan = $headerCfg->kondisi_keuangan ?? $deriveStatus($ratios);
 
+    // setelah variabel $line, $latestBal, dll dibuat
+    $asetDefault  = (int)($latestBal->total_assets ?? 0);
+    // Beban YTD pakai total opex dari line chart
+    $bebanDefault = (int) collect($line)->sum('opex');
     // susun payload ke Blade
     $data = [
         'header' => [
@@ -269,7 +283,10 @@ public function indexView()
             'assets'      => (int)($latestBal->total_assets ?? 0),
             'liabilities' => (int)($latestBal->total_liabilities ?? 0),
             'equity'      => (int)($latestBal->total_equity ?? 0),
-        ],
+        ],'compare_avb' => [                   // ✅ baru
+        'assets'  => $asetDefault,
+        'expenses'=> $bebanDefault,
+    ],
 
     ];
 
