@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CoopDashboardUpdateController;
 use App\Http\Controllers\CoopDashboardController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\DeliveryNotedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,4 +32,25 @@ Route::put('/koperasi/dashboard/update-monthlies',   [CoopDashboardUpdateControl
 Route::put('/koperasi/dashboard/update-participation',
     [CoopDashboardUpdateController::class, 'updateParticipation']
 )->name('coop.dashboard.update.participation');
+
+Route::prefix('invoice')->name('invoice.')->group(function () {
+    Route::get('/', [InvoiceController::class, 'index'])->name('index');
+    Route::get('/create', [InvoiceController::class, 'create'])->name('create');
+    Route::post('/', [InvoiceController::class, 'store'])->name('store');
+    Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
+    Route::get('/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit');
+    Route::put('/{invoice}', [InvoiceController::class, 'update'])->name('update');
+    Route::delete('/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('delivery-note')->name('delivery-note.')->group(function () {
+    Route::get('/', [DeliveryNotedController::class, 'index'])->name('index');
+    Route::get('/create', [DeliveryNotedController::class, 'create'])->name('create');
+    Route::post('/store', [DeliveryNotedController::class, 'store'])->name('store');
+    Route::get('/{id}/edit', [DeliveryNotedController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [DeliveryNotedController::class, 'update'])->name('update');
+    Route::delete('/{id}', [DeliveryNotedController::class, 'destroy'])->name('destroy');
+    Route::get('/{id}/pdf', [DeliveryNotedController::class, 'generatePDF'])->name('pdf');
+    Route::get('/{id}/detail', [DeliveryNotedController::class, 'detail'])->name('detail');
+});
 

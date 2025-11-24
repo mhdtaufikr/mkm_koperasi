@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Surat Pengantar - {{ $deliveryNote->delivery_note_no }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .header h3 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .header p {
+            margin: 2px 0;
+            font-size: 10px;
+        }
+
+        .title-section {
+            margin: 20px 0 10px 0;
+        }
+
+        .title-section h4 {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .title-section .info {
+            font-size: 11px;
+            margin: 2px 0;
+        }
+
+        .intro-text {
+            margin: 15px 0;
+            font-size: 11px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 20px 0;
+        }
+
+        .items-table th,
+        .items-table td {
+            border: 1px solid #000;
+            padding: 6px 8px;
+            font-size: 10px;
+        }
+
+        .items-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .items-table td {
+            vertical-align: top;
+        }
+
+        .items-table td.number {
+            text-align: center;
+            width: 5%;
+        }
+
+        .items-table td.item-name {
+            width: 40%;
+        }
+
+        .items-table td.quantity {
+            text-align: center;
+            width: 15%;
+        }
+
+        .items-table td.unit {
+            width: 15%;
+        }
+
+        .items-table td.description {
+            width: 25%;
+        }
+
+        /* Tambah baris kosong untuk mengisi halaman */
+        .empty-rows td {
+            border-left: 1px solid #000;
+            border-right: 1px solid #000;
+            height: 25px;
+        }
+
+        .footer-code {
+            margin-top: 10px;
+            font-size: 10px;
+        }
+
+        .signature-section {
+            margin-top: 30px;
+        }
+
+        .signature-table {
+            width: 100%;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 50%;
+            padding: 0 20px;
+        }
+
+        .signature-box p {
+            margin: 5px 0;
+            font-size: 11px;
+        }
+
+        .signature-space {
+            height: 60px;
+        }
+
+        .signature-name {
+            margin-top: 5px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h3>KOPERASI KARYAWAN MITSUBISHI KRAMAYUDHA MOTORS</h3>
+        <p><strong>Perdagangan Umum, Suppliers, Contractors</strong></p>
+        <p>Jl. Raya Bekasi KM-21 Pulo Gadung, Jakarta Timur, PO BOX 3348/JKT 10033</p>
+        <p>Telp. : 4602908 - 4602911 Fax. : 4602915</p>
+    </div>
+
+    <div class="title-section">
+        <h4>SURAT PENGANTAR</h4>
+        <div class="info">No: <strong>{{ $deliveryNote->delivery_note_no }}</strong></div>
+        @if($deliveryNote->vehicle_no)
+        <div class="info">Kendaraan No: <strong>{{ $deliveryNote->vehicle_no }}</strong></div>
+        @endif
+    </div>
+
+    <div class="intro-text">
+        Harap diterima dengan baik, barang-barang seperti tersebut di bawah ini :
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>NO.</th>
+                <th>NAMA BARANG</th>
+                <th>BANYAKNYA</th>
+                <th>SATUAN</th>
+                <th>KETERANGAN</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($items as $index => $item)
+            <tr>
+                <td class="number">{{ $index + 1 }}</td>
+                <td class="item-name">{{ strtoupper($item->item_name) }}</td>
+                <td class="quantity">{{ $item->quantity }}</td>
+                <td class="unit">{{ strtoupper($item->unit) }}</td>
+                <td class="description">{{ $item->description }}</td>
+            </tr>
+            @endforeach
+
+            {{-- Tambah baris kosong sampai minimal 15 baris --}}
+            @for($i = count($items); $i < 15; $i++)
+            <tr class="empty-rows">
+                <td class="number">&nbsp;</td>
+                <td class="item-name">&nbsp;</td>
+                <td class="quantity">&nbsp;</td>
+                <td class="unit">&nbsp;</td>
+                <td class="description">&nbsp;</td>
+            </tr>
+            @endfor
+        </tbody>
+    </table>
+
+    <div class="footer-code">
+        {{ $deliveryNote->footer_code }}
+    </div>
+
+    <div class="signature-section">
+        <table class="signature-table">
+            <tr>
+                <td class="signature-box" style="text-align: right; padding-right: 100px;">
+                    {{ $deliveryNote->location }}, {{ \Carbon\Carbon::parse($deliveryNote->delivery_date)->locale('id')->translatedFormat('d F Y') }}
+                </td>
+            </tr>
+        </table>
+
+        <table class="signature-table" style="margin-top: 20px;">
+            <tr>
+                <td class="signature-box">
+                    <p>Yang menerima</p>
+                    <div class="signature-space"></div>
+                    <div class="signature-name">
+                        @if($deliveryNote->receiver_name)
+                            {{ strtoupper($deliveryNote->receiver_name) }}
+                        @else
+                            ( ................................ )
+                        @endif
+                    </div>
+                    <p style="font-size: 10px; margin-top: 3px;">(Nama Jelas)</p>
+                </td>
+                <td class="signature-box">
+                    <p>{{ strtoupper($deliveryNote->sender_name ?? 'KOPKAR MKM') }}</p>
+                    <div class="signature-space"></div>
+                    <div class="signature-name">DESI</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    @if($deliveryNote->notes)
+    <div style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <strong>Catatan:</strong> {{ $deliveryNote->notes }}
+    </div>
+    @endif
+</body>
+</html>
