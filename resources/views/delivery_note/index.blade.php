@@ -80,7 +80,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">No. Surat Pengantar <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="delivery_note_no" readonly>
+                                    <input type="text" class="form-control" id="delivery_note_no">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -122,7 +122,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Footer Code</label>
-                                    <input type="text" class="form-control" id="footer_code" readonly>
+                                    <input type="text" class="form-control" id="footer_code">
                                     <small class="text-muted">Format: MKM/DX/FR/MEC/MAC/YY/MM/NNN</small>
                                 </div>
                             </div>
