@@ -96,12 +96,6 @@
             width: 25%;
         }
 
-        /* BARIS KOSONG */
-        .empty-rows td {
-            height: 22px;
-            border: none !important; /* pastikan tanpa garis */
-        }
-
         .footer-code {
             margin-top: 10px;
             font-size: 10px;
@@ -184,16 +178,6 @@
             </tr>
             @endforeach
 
-            {{-- Tambah baris kosong sampai minimal 15 baris --}}
-            @for($i = count($items); $i < 15; $i++)
-            <tr class="empty-rows">
-                <td class="number">&nbsp;</td>
-                <td class="item-name">&nbsp;</td>
-                <td class="quantity">&nbsp;</td>
-                <td class="unit">&nbsp;</td>
-                <td class="description">&nbsp;</td>
-            </tr>
-            @endfor
         </tbody>
     </table>
 
