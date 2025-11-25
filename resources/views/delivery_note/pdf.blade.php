@@ -17,44 +17,47 @@
             padding: 20px;
         }
 
+        /* HEADER */
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
+            margin-bottom: 25px;
+            padding-bottom: 0; /* no border */
+            border: none !important;
         }
 
         .header h3 {
             margin: 0;
-            font-size: 13px;
+            font-size: 20px; /* diperbesar */
             font-weight: bold;
         }
 
         .header p {
-            margin: 2px 0;
-            font-size: 10px;
+            margin: 3px 0;
+            font-size: 12px;
         }
 
+        /* TITLE SECTION */
         .title-section {
             margin: 20px 0 10px 0;
         }
 
         .title-section h4 {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             margin-bottom: 5px;
         }
 
         .title-section .info {
-            font-size: 11px;
+            font-size: 12px;
             margin: 2px 0;
         }
 
         .intro-text {
             margin: 15px 0;
-            font-size: 11px;
+            font-size: 12px;
         }
 
+        /* TABLE TANPA GARIS */
         .items-table {
             width: 100%;
             border-collapse: collapse;
@@ -63,23 +66,17 @@
 
         .items-table th,
         .items-table td {
-            border: 1px solid #000;
+            border: none; /* Hapus semua garis */
             padding: 6px 8px;
-            font-size: 10px;
+            font-size: 11px;
         }
 
         .items-table th {
-            background-color: #f5f5f5;
             font-weight: bold;
-            text-align: center;
-        }
-
-        .items-table td {
-            vertical-align: top;
+            text-align: left;
         }
 
         .items-table td.number {
-            text-align: center;
             width: 5%;
         }
 
@@ -88,7 +85,6 @@
         }
 
         .items-table td.quantity {
-            text-align: center;
             width: 15%;
         }
 
@@ -100,11 +96,10 @@
             width: 25%;
         }
 
-        /* Tambah baris kosong untuk mengisi halaman */
+        /* BARIS KOSONG */
         .empty-rows td {
-            border-left: 1px solid #000;
-            border-right: 1px solid #000;
-            height: 25px;
+            height: 22px;
+            border: none !important; /* pastikan tanpa garis */
         }
 
         .footer-code {
@@ -112,6 +107,7 @@
             font-size: 10px;
         }
 
+        /* SIGNATURE */
         .signature-section {
             margin-top: 30px;
         }
@@ -145,6 +141,7 @@
             page-break-after: always;
         }
     </style>
+
 </head>
 <body>
     <div class="header">
