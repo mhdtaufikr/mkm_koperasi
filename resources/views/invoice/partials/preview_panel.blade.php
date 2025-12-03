@@ -21,7 +21,7 @@
                 <div id="preview_subtotal">Rp 0,00</div>
             </div>
             <div class="d-flex justify-content-between mt-2">
-                <div>PPh 23 (<input id="pph23_input" style="width:60px;display:inline-block" type="number" value="2">%)</div>
+                <div>V.A.T (<input id="pph23_input" style="width:60px;display:inline-block" type="number" value="2">%)</div>
                 <div id="preview_pph23">-Rp 0,00</div>
             </div>
             <div class="d-flex justify-content-between mt-2">

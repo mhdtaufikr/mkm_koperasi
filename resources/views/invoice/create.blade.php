@@ -187,62 +187,81 @@
         }
 
         function calcTotal(){
-            let itemSubtotal = 0;   // sum of line subtotal (qty*price)
-            let discountSum = 0;    // sum discount amount across items
-            let taxSum = 0;         // sum tax amount across items
-            let grossUpSum = 0;     // sum gross up across items
+        let itemSubtotal = 0;   // sum of line subtotal (qty*price)
+        let discountSum = 0;    // sum discount amount across items
+        let taxSum = 0;         // sum tax amount across items
+        let grossUpSum = 0;     // sum gross up across items
 
-            document.querySelectorAll('.item-row').forEach(row=>{
-                const q = parseFloat(row.querySelector('.item-quantity')?.value || 0);
-                const p = parseFloat(row.querySelector('.item-price')?.value || 0);
-                let d = parseFloat(row.querySelector('.item-discount')?.value || 0);
-                const t = parseFloat(row.querySelector('.item-tax')?.value || 0);
-                const g = parseFloat(row.querySelector('.item-gross')?.value || 0);
+        document.querySelectorAll('.item-row').forEach(row=>{
+            const q = parseFloat(row.querySelector('.item-quantity')?.value || 0);
+            const p = parseFloat(row.querySelector('.item-price')?.value || 0);
+            let d = parseFloat(row.querySelector('.item-discount')?.value || 0);
+            const t = parseFloat(row.querySelector('.item-tax')?.value || 0);
+            const g = parseFloat(row.querySelector('.item-gross')?.value || 0);
 
-                const lineSubtotal = q * p;
+            const lineSubtotal = q * p;
 
-                // Interpretasi diskon: jika d <= 100 treat as percent, else nominal
-                let lineDiscount = 0;
-                if (d > 0 && d <= 100) {
-                    lineDiscount = (lineSubtotal) * (d/100); // persen
-                } else {
-                    lineDiscount = d; // nominal
-                }
+            // Interpretasi diskon: jika d <= 100 treat as percent, else nominal
+            let lineDiscount = 0;
+            if (d > 0 && d <= 100) {
+                lineDiscount = (lineSubtotal) * (d/100); // persen
+            } else {
+                lineDiscount = d; // nominal
+            }
 
-                const lineTax = (lineSubtotal - lineDiscount) * (t/100);
-                const lineGross = g;
+            const lineTax = (lineSubtotal - lineDiscount) * (t/100);
+            const lineGross = g;
 
-                itemSubtotal += lineSubtotal;
-                discountSum += lineDiscount;
-                taxSum += lineTax;
-                grossUpSum += lineGross;
-            });
+            itemSubtotal += lineSubtotal;
+            discountSum += lineDiscount;
+            taxSum += lineTax;
+            grossUpSum += lineGross;
+        });
 
-            // Menurut contoh: Subtotal preview menampilkan item subtotal + gross up
-            const previewSubtotal = itemSubtotal + grossUpSum;
+        // Subtotal preview menampilkan item subtotal + gross up
+        const previewSubtotal = itemSubtotal + grossUpSum;
 
-            // PPh23 dihitung dari Gross Up (sesuai contoh). Jika kamu mau beda, ubah di sini.
-            const pphPercent = parseFloat(document.getElementById('pph23_input')?.value || 0);
-            const pphAmount = - Math.round((grossUpSum * (pphPercent/100)) * 100) / 100;
+        // PPh23 dihitung dari previewSubtotal sebagai PENAMBAH (bukan pemotongan)
+        const pphPercent = parseFloat(document.getElementById('pph23_input')?.value || 0);
+        const pphAmount = Math.round((previewSubtotal * (pphPercent/100)) * 100) / 100;
 
-            // Grand total = subtotal (item + grossUp) - discountSum + taxSum + pphAmount
-            const grand = previewSubtotal - discountSum + taxSum + pphAmount;
+        // Grand total = subtotal (item + grossUp) - discountSum + taxSum + pphAmount
+        const grand = previewSubtotal - discountSum + taxSum + pphAmount;
 
-            // Update preview DOM
-            document.getElementById('preview_gross_up').innerText = formatIDR(grossUpSum);
-            document.getElementById('preview_subtotal').innerText = formatIDR(previewSubtotal);
-            document.getElementById('preview_pph23').innerText = (pphAmount < 0 ? '-' : '') + formatIDR(Math.abs(pphAmount));
-            document.getElementById('preview_diskon').innerText = '-' + formatIDR(discountSum);
-            document.getElementById('preview_pajak').innerText = formatIDR(taxSum);
-            document.getElementById('preview_grand_total').innerText = formatIDR(grand);
+        // Update preview DOM
+        document.getElementById('preview_gross_up').innerText = formatIDR(grossUpSum);
+        document.getElementById('preview_subtotal').innerText = formatIDR(previewSubtotal);
+        // tampilkan PPh sebagai penambah dengan tanda plus
+        document.getElementById('preview_pph23').innerText = '+' + formatIDR(pphAmount);
+        document.getElementById('preview_diskon').innerText = '-' + formatIDR(discountSum);
+        document.getElementById('preview_pajak').innerText = formatIDR(taxSum);
+        document.getElementById('preview_grand_total').innerText = formatIDR(grand);
 
-            // update top grand
-            const grandTopEl = document.getElementById('grandTotalTop') || document.getElementById('grandTotal');
-            if (grandTopEl) grandTopEl.innerText = formatIDR(grand);
+        // update top grand
+        const grandTopEl = document.getElementById('grandTotalTop') || document.getElementById('grandTotal');
+        if (grandTopEl) grandTopEl.innerText = formatIDR(grand);
 
-            // update terbilang
-            document.getElementById('terbilang').innerText = terbilang(Math.round(grand));
+        // update terbilang
+        document.getElementById('terbilang').innerText = terbilang(Math.round(grand));
+
+        // --- optional: simpan nilai-nilai total ke hidden inputs sebelum submit ---
+        // bila kamu menambahkan <input type="hidden" name="subtotal"> dsb pada form,
+        // maka update nilainya di sini supaya backend menerima angka final.
+        const form = document.getElementById('invoiceForm');
+        if (form) {
+            const setIfExists = (name, value) => {
+                const el = form.querySelector(`input[name="${name}"]`);
+                if (el) el.value = value;
+            };
+            setIfExists('subtotal', itemSubtotal);
+            setIfExists('gross_up_total', grossUpSum);
+            setIfExists('discount_total', discountSum);
+            setIfExists('tax_total', taxSum);
+            setIfExists('pph23_total', pphAmount);
+            setIfExists('total', grand);
         }
+    }
+
 
         // re-calc saat PPh23 diubah
         document.getElementById('pph23_input').addEventListener('input', calcTotal);
