@@ -7,6 +7,7 @@ use App\Models\InvoiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use PDF;
 
 class InvoiceController extends Controller
 {
@@ -349,5 +350,25 @@ class InvoiceController extends Controller
         $msg = $e->getMessage();
         return (stripos($msg, 'Duplicate entry') !== false && stripos($msg, 'no_invoice') !== false)
             || (stripos($msg, 'invoices_no_invoice_unique') !== false);
+    }
+    public function exportPdf(Invoice $invoice)
+    {
+        // eager load items
+        $invoice->load('items');
+
+        // siapkan data untuk view
+        $data = [
+            'invoice' => $invoice,
+            'items' => $invoice->items,
+        ];
+
+        // generate view menjadi PDF
+        $pdf = PDF::loadView('invoice.pdf', $data);
+
+        // nama file contoh: invoice-<no_invoice>.pdf
+        $filename = 'invoice-' . preg_replace('/[^A-Za-z0-9\-]/','', $invoice->no_invoice) . '.pdf';
+
+        // download langsung
+        return $pdf->download($filename);
     }
 }

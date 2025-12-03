@@ -41,6 +41,8 @@ Route::prefix('invoice')->name('invoice.')->group(function () {
     Route::get('/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit');
     Route::put('/{invoice}', [InvoiceController::class, 'update'])->name('update');
     Route::delete('/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy');
+    Route::get('/{invoice}/export-pdf', [InvoiceController::class, 'exportPdf'])->name('exportPdf');
+
 });
 
 Route::prefix('delivery-note')->name('delivery-note.')->group(function () {

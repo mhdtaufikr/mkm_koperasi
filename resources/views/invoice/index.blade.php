@@ -36,12 +36,15 @@
                     <td>
                         <a href="{{ route('invoice.show', $invoice) }}" class="btn btn-sm btn-info">Lihat</a>
                         <a href="{{ route('invoice.edit', $invoice) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{{ route('invoice.exportPdf', $invoice) }}" class="btn btn-sm btn-primary">Export PDF</a>
+
                         <form action="{{ route('invoice.destroy', $invoice) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus invoice?')">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger">Hapus</button>
                         </form>
                     </td>
+
                 </tr>
             @empty
                 <tr><td colspan="8">Tidak ada invoice</td></tr>
