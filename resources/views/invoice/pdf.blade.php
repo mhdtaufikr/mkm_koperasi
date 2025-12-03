@@ -92,7 +92,7 @@
 
     <div style="margin-top:20px;">
         <strong>Jumlah Tertagih:</strong> Rp {{ number_format($invoice->total ?? 0,0,',','.') }}<br>
-        <div style="margin-top:8px;">
+        <div style="margin-top:8px;">{{-- sda --}}
             Pembayaran mohon ditransfer via rekening :<br>
             <div class="small">Bank Mandiri<br>Norek : 13000122121<br>Atas Nama : Koperasi KMS</div>
         </div>
