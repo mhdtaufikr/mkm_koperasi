@@ -5,9 +5,12 @@
     <title>Surat Pengantar - {{ $deliveryNote->delivery_note_no }}</title>
 
     <style>
-        /* Margin kertas untuk PDF: lebih lega kiri-kanan */
+        /* 🚨 Margin kertas diperbesar signifikan */
         @page {
-            margin: 58px 78px; /* atas-bawah | kiri-kanan (lebih besar) */
+            margin-top: 30px;
+            margin-bottom: 30px;
+            margin-left: 70px;   /* INI YANG PENTING */
+            margin-right: 70px;  /* INI YANG PENTING */
         }
 
         * {
@@ -19,64 +22,65 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 11px;
-            line-height: 1.4;
+            line-height: 1.5;
             margin: 0;
             padding: 0;
         }
 
-        /* Wrapper supaya isi nggak nempel tepi (tambahan ruang lagi) */
+        /* Wrapper utama */
         .page {
-            padding: 8px 10px; /* top-bottom | left-right */
+            padding: 10px 20px; /* tambah ruang kiri-kanan lagi */
         }
 
         /* HEADER */
         .header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .header h3 {
             font-size: 20px;
             font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
         .header p {
-            margin: 3px 0;
+            margin: 4px 0;
             font-size: 12px;
         }
 
-        /* TITLE SECTION */
+        /* TITLE */
         .title-section {
-            margin: 20px 0 10px 0;
+            margin: 20px 0 12px 0;
         }
 
         .title-section h4 {
             font-size: 16px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
 
         .title-section .info {
             font-size: 12px;
-            margin: 2px 0;
+            margin: 3px 0;
         }
 
         .intro-text {
-            margin: 15px 0;
+            margin: 18px 0;
             font-size: 12px;
         }
 
-        /* TABLE TANPA GARIS */
+        /* TABLE */
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 10px 0 20px 0;
+            margin: 15px 0 25px 0;
         }
 
         .items-table th,
         .items-table td {
             border: none;
-            padding: 6px 8px;
+            padding: 8px 10px; /* lebih longgar */
             font-size: 11px;
             vertical-align: top;
             word-break: break-word;
@@ -88,19 +92,19 @@
         }
 
         .items-table td.number { width: 6%; }
-        .items-table td.item-name { width: 40%; }
+        .items-table td.item-name { width: 38%; }
         .items-table td.quantity { width: 14%; }
         .items-table td.unit { width: 12%; }
-        .items-table td.description { width: 28%; }
+        .items-table td.description { width: 30%; }
 
         .footer-code {
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 10px;
         }
 
         /* SIGNATURE */
         .signature-section {
-            margin-top: 30px;
+            margin-top: 40px;
         }
 
         .signature-table {
@@ -108,28 +112,33 @@
         }
 
         .signature-box {
-            text-align: center;
             width: 50%;
-            padding: 0 20px;
+            text-align: center;
+            padding: 0 30px; /* BIKIN TTD GAK NEMPEL */
         }
 
         .signature-box p {
-            margin: 5px 0;
+            margin: 6px 0;
             font-size: 11px;
         }
 
         .signature-space {
-            height: 60px;
+            height: 65px;
         }
 
         .signature-name {
-            margin-top: 5px;
+            margin-top: 6px;
             font-weight: bold;
             text-decoration: underline;
         }
 
-        .page-break {
-            page-break-after: always;
+        /* CATATAN */
+        .notes {
+            margin-top: 30px;
+            padding: 12px 16px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            font-size: 11px;
         }
     </style>
 </head>
@@ -147,9 +156,7 @@
     <div class="title-section">
         <h4>SURAT PENGANTAR</h4>
         <div class="info">No: <strong>{{ $deliveryNote->delivery_note_no }}</strong></div>
-        @if($deliveryNote->vehicle_no)
-            <div class="info">Kendaraan No: <strong>{{ $deliveryNote->vehicle_no }}</strong></div>
-        @endif
+        <div class="info">Kendaraan No: <strong>{{ $deliveryNote->vehicle_no ?? '-' }}</strong></div>
     </div>
 
     <div class="intro-text">
@@ -186,24 +193,23 @@
     <div class="signature-section">
         <table class="signature-table">
             <tr>
-                <td class="signature-box" style="text-align:right; padding-right:40px;">
+                <td class="signature-box" style="text-align:left;">
                     {{ $deliveryNote->location }},
                     {{ \Carbon\Carbon::parse($deliveryNote->delivery_date)->locale('id')->translatedFormat('d F Y') }}
+                </td>
+                <td class="signature-box" style="text-align:right;">
+                    KOPKAR MKM
                 </td>
             </tr>
         </table>
 
-        <table class="signature-table" style="margin-top:20px;">
+        <table class="signature-table" style="margin-top:25px;">
             <tr>
                 <td class="signature-box">
                     <p>Yang menerima</p>
                     <div class="signature-space"></div>
                     <div class="signature-name">
-                        @if($deliveryNote->receiver_name)
-                            {{ strtoupper($deliveryNote->receiver_name) }}
-                        @else
-                            ( ................................ )
-                        @endif
+                        {{ strtoupper($deliveryNote->receiver_name ?? 'PT. MKM') }}
                     </div>
                     <p style="font-size:10px;">(Nama Jelas)</p>
                 </td>
@@ -217,7 +223,7 @@
     </div>
 
     @if($deliveryNote->notes)
-    <div style="margin-top:20px; padding:10px; border:1px solid #ccc; background:#f9f9f9;">
+    <div class="notes">
         <strong>Catatan:</strong> {{ $deliveryNote->notes }}
     </div>
     @endif
