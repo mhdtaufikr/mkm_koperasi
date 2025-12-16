@@ -39,7 +39,7 @@
         /* Tanda tangan: fixed tapi dinaikkan dari bawah */
         .signature {
             position: fixed;
-            bottom: 300px;   /* <-- ini bikin "Dengan Hormat," nggak mepet bawah */
+            bottom: 150px;   /* <-- ini bikin "Dengan Hormat," nggak mepet bawah */
             right: 28px;
             text-align: center;
         }
