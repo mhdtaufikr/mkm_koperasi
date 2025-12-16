@@ -123,7 +123,7 @@
                 <div class="small">Bank Mandiri<br>Norek : 1250056000086<br>Atas Nama : KOPERASI KARYAWAN PT</div>
             </div>
         </div>
-{{-- asdsad --}}
+
         <div class="signature">
             <div>Dengan Hormat,</div>
             <div style="height:60px;"></div>
