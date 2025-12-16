@@ -28,7 +28,7 @@
             <div>Tanggal: {{ optional($invoice->tanggal_terbit)->format('Y-m-d') }}</div>
             <div>Tgl. Jatuh Tempo: {{ optional($invoice->tanggal_jatuh_tempo)->format('Y-m-d') }}</div>
         </div>
-    </div>
+    </div>{{-- asd --}}
 
     <div>
         <strong>Kepada Yth:</strong>
@@ -37,7 +37,6 @@
         @if($invoice->no_po)<div>No. PO: {{ $invoice->no_po }}</div>@endif
     </div>
 
-<<<<<<< HEAD
         <div style="margin-top:20px;">
             <strong>Jumlah Tertagih:</strong> Rp {{ number_format($invoice->total ?? 0,0,',','.') }}<br>
             <div style="margin-top:8px;">
@@ -50,66 +49,6 @@
             <div>Dengan Hormat,</div>
             <div style="height:60px;"></div>
             <div><strong>{{ $invoice->tertanda ?? 'Zuhadi' }}</strong></div>
-=======
-    <table>
-        <thead>
-            <tr>
-                <th style="width:6%;">No</th>
-                <th>Deskripsi</th>
-                <th style="width:12%;">Kuantitas</th>
-                <th style="width:18%;">Harga / Unit</th>
-                <th style="width:18%;">Jumlah</th>
-            </tr>
-        </thead>
-        <tbody>
-            @php $i=1; @endphp
-            @forelse($items as $item)
-                <tr>
-                    <td class="right">{{ $i++ }}</td>
-                    <td>{!! nl2br(e($item->description)) !!}</td>
-                    <td class="right">{{ (float)$item->quantity }} {{ $item->quantity_unit }}</td>
-                    <td class="right">Rp {{ number_format($item->price,0,',','.') }}</td>
-                    <td class="right">Rp {{ number_format($item->line_total ?? $item->line_subtotal ?? ($item->price * $item->quantity),0,',','.') }}</td>
-                </tr>
-            @empty
-                <tr><td colspan="5">No items</td></tr>
-            @endforelse
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="3" class="no-border"></td>
-                <td class="right"><strong>Subtotal</strong></td>
-                <td class="right">Rp {{ number_format($invoice->subtotal ?? 0,0,',','.') }}</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="no-border"></td>
-                <td class="right">Diskon</td>
-                <td class="right">Rp {{ number_format($invoice->discount_total ?? 0,0,',','.') }}</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="no-border"></td>
-                <td class="right">PPh / Gross Up</td>
-                <td class="right">Rp {{ number_format(($invoice->gross_up ?? 0),0,',','.') }}</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="no-border"></td>
-                <td class="right">PPN</td>
-                <td class="right">Rp {{ number_format($invoice->tax_total ?? 0,0,',','.') }}</td>
-            </tr>
-            <tr>
-                <td colspan="3" class="no-border"></td>
-                <td class="right"><strong>Total</strong></td>
-                <td class="right"><strong>Rp {{ number_format($invoice->total ?? 0,0,',','.') }}</strong></td>
-            </tr>
-        </tfoot>
-    </table>
-
-    <div style="margin-top:20px;">
-        <strong>Jumlah Tertagih:</strong> Rp {{ number_format($invoice->total ?? 0,0,',','.') }}<br>
-        <div style="margin-top:8px;">{{-- sda --}}
-            Pembayaran mohon ditransfer via rekening :<br>
-            <div class="small">Bank Mandiri<br>Norek : 1250056000086<br>Atas Nama : KOPERASI KARYAWAN PT</div>
->>>>>>> refs/remotes/origin/main
         </div>
     </div>
 
