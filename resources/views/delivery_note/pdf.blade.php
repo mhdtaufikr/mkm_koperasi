@@ -5,9 +5,9 @@
     <title>Surat Pengantar - {{ $deliveryNote->delivery_note_no }}</title>
 
     <style>
-        /* MARGIN KERTAS (PALING PENTING UNTUK PDF) */
+        /* Margin kertas untuk PDF: lebih lega kiri-kanan */
         @page {
-            margin: 28px 32px; /* atas-bawah | kiri-kanan */
+            margin: 28px 48px; /* atas-bawah | kiri-kanan (lebih besar) */
         }
 
         * {
@@ -21,12 +21,12 @@
             font-size: 11px;
             line-height: 1.4;
             margin: 0;
-            padding: 0; /* jangan pakai padding di body */
+            padding: 0;
         }
 
-        /* WRAPPER AGAR ISI TIDAK NEMPEL */
+        /* Wrapper supaya isi nggak nempel tepi (tambahan ruang lagi) */
         .page {
-            padding: 6px 4px;
+            padding: 8px 10px; /* top-bottom | left-right */
         }
 
         /* HEADER */
@@ -78,6 +78,8 @@
             border: none;
             padding: 6px 8px;
             font-size: 11px;
+            vertical-align: top;
+            word-break: break-word;
         }
 
         .items-table th {
@@ -85,11 +87,11 @@
             text-align: left;
         }
 
-        .items-table td.number { width: 5%; }
+        .items-table td.number { width: 6%; }
         .items-table td.item-name { width: 40%; }
-        .items-table td.quantity { width: 15%; }
-        .items-table td.unit { width: 15%; }
-        .items-table td.description { width: 25%; }
+        .items-table td.quantity { width: 14%; }
+        .items-table td.unit { width: 12%; }
+        .items-table td.description { width: 28%; }
 
         .footer-code {
             margin-top: 10px;
@@ -184,7 +186,7 @@
     <div class="signature-section">
         <table class="signature-table">
             <tr>
-                <td class="signature-box" style="text-align:right; padding-right:80px;">
+                <td class="signature-box" style="text-align:right; padding-right:40px;">
                     {{ $deliveryNote->location }},
                     {{ \Carbon\Carbon::parse($deliveryNote->delivery_date)->locale('id')->translatedFormat('d F Y') }}
                 </td>
