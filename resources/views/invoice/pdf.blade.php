@@ -33,13 +33,13 @@
 
         /* Sisihkan ruang bawah supaya tanda tangan gak mepet/nimpa */
         .footer-space {
-            height: 300px; /* atur kalau masih kurang */
+            height: 130px; /* atur kalau masih kurang */
         }
 
         /* Tanda tangan: fixed tapi dinaikkan dari bawah */
         .signature {
             position: fixed;
-            bottom: 60px;   /* <-- ini bikin "Dengan Hormat," nggak mepet bawah */
+            bottom: 300px;   /* <-- ini bikin "Dengan Hormat," nggak mepet bawah */
             right: 28px;
             text-align: center;
         }
