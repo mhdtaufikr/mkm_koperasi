@@ -33,7 +33,7 @@
 
         /* Sisihkan ruang bawah supaya tanda tangan gak mepet/nimpa */
         .footer-space {
-            height: 20px; /* atur kalau masih kurang */
+            height: 300px; /* atur kalau masih kurang */
         }
 
         /* Tanda tangan: fixed tapi dinaikkan dari bawah */
