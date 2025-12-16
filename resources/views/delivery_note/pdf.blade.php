@@ -3,7 +3,13 @@
 <head>
     <meta charset="utf-8">
     <title>Surat Pengantar - {{ $deliveryNote->delivery_note_no }}</title>
+
     <style>
+        /* MARGIN KERTAS (PALING PENTING UNTUK PDF) */
+        @page {
+            margin: 28px 32px; /* atas-bawah | kiri-kanan */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,20 +20,23 @@
             font-family: Arial, sans-serif;
             font-size: 11px;
             line-height: 1.4;
-            padding: 20px;
+            margin: 0;
+            padding: 0; /* jangan pakai padding di body */
+        }
+
+        /* WRAPPER AGAR ISI TIDAK NEMPEL */
+        .page {
+            padding: 6px 4px;
         }
 
         /* HEADER */
         .header {
             text-align: center;
             margin-bottom: 25px;
-            padding-bottom: 0; /* no border */
-            border: none !important;
         }
 
         .header h3 {
-            margin: 0;
-            font-size: 20px; /* diperbesar */
+            font-size: 20px;
             font-weight: bold;
         }
 
@@ -66,7 +75,7 @@
 
         .items-table th,
         .items-table td {
-            border: none; /* Hapus semua garis */
+            border: none;
             padding: 6px 8px;
             font-size: 11px;
         }
@@ -76,25 +85,11 @@
             text-align: left;
         }
 
-        .items-table td.number {
-            width: 5%;
-        }
-
-        .items-table td.item-name {
-            width: 40%;
-        }
-
-        .items-table td.quantity {
-            width: 15%;
-        }
-
-        .items-table td.unit {
-            width: 15%;
-        }
-
-        .items-table td.description {
-            width: 25%;
-        }
+        .items-table td.number { width: 5%; }
+        .items-table td.item-name { width: 40%; }
+        .items-table td.quantity { width: 15%; }
+        .items-table td.unit { width: 15%; }
+        .items-table td.description { width: 25%; }
 
         .footer-code {
             margin-top: 10px;
@@ -135,9 +130,11 @@
             page-break-after: always;
         }
     </style>
-
 </head>
+
 <body>
+<div class="page">
+
     <div class="header">
         <h3>KOPERASI KARYAWAN MITSUBISHI KRAMAYUDHA MOTORS</h3>
         <p><strong>Perdagangan Umum, Suppliers, Contractors</strong></p>
@@ -149,7 +146,7 @@
         <h4>SURAT PENGANTAR</h4>
         <div class="info">No: <strong>{{ $deliveryNote->delivery_note_no }}</strong></div>
         @if($deliveryNote->vehicle_no)
-        <div class="info">Kendaraan No: <strong>{{ $deliveryNote->vehicle_no }}</strong></div>
+            <div class="info">Kendaraan No: <strong>{{ $deliveryNote->vehicle_no }}</strong></div>
         @endif
     </div>
 
@@ -177,7 +174,6 @@
                 <td class="description">{{ $item->description }}</td>
             </tr>
             @endforeach
-
         </tbody>
     </table>
 
@@ -188,13 +184,14 @@
     <div class="signature-section">
         <table class="signature-table">
             <tr>
-                <td class="signature-box" style="text-align: right; padding-right: 100px;">
-                    {{ $deliveryNote->location }}, {{ \Carbon\Carbon::parse($deliveryNote->delivery_date)->locale('id')->translatedFormat('d F Y') }}
+                <td class="signature-box" style="text-align:right; padding-right:80px;">
+                    {{ $deliveryNote->location }},
+                    {{ \Carbon\Carbon::parse($deliveryNote->delivery_date)->locale('id')->translatedFormat('d F Y') }}
                 </td>
             </tr>
         </table>
 
-        <table class="signature-table" style="margin-top: 20px;">
+        <table class="signature-table" style="margin-top:20px;">
             <tr>
                 <td class="signature-box">
                     <p>Yang menerima</p>
@@ -206,7 +203,7 @@
                             ( ................................ )
                         @endif
                     </div>
-                    <p style="font-size: 10px; margin-top: 3px;">(Nama Jelas)</p>
+                    <p style="font-size:10px;">(Nama Jelas)</p>
                 </td>
                 <td class="signature-box">
                     <p>{{ strtoupper($deliveryNote->sender_name ?? 'KOPKAR MKM') }}</p>
@@ -218,9 +215,11 @@
     </div>
 
     @if($deliveryNote->notes)
-    <div style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9;">
+    <div style="margin-top:20px; padding:10px; border:1px solid #ccc; background:#f9f9f9;">
         <strong>Catatan:</strong> {{ $deliveryNote->notes }}
     </div>
     @endif
+
+</div>
 </body>
 </html>
