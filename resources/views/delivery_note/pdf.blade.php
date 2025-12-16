@@ -7,7 +7,7 @@
     <style>
         /* Margin kertas untuk PDF: lebih lega kiri-kanan */
         @page {
-            margin: 28px 48px; /* atas-bawah | kiri-kanan (lebih besar) */
+            margin: 58px 78px; /* atas-bawah | kiri-kanan (lebih besar) */
         }
 
         * {
