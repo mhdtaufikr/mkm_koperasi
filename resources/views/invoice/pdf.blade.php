@@ -4,19 +4,19 @@
     <meta charset="utf-8">
     <title>Invoice {{ $invoice->no_invoice }}</title>
     <style>
-        /* Bikin aman untuk PDF (DomPDF biasanya hormati @page) */
+        /* Aman untuk PDF */
         @page { margin: 24px 28px; } /* atas-bawah, kiri-kanan */
 
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
             color: #222;
-            margin: 0; /* biar @page yang ngatur */
+            margin: 0;
         }
 
-        /* Container supaya isi nggak nempel tepi */
+        /* Container */
         .page {
-            padding: 6px 4px; /* tambahan ruang dalam */
+            padding: 6px 4px;
         }
 
         .header { display:flex; justify-content:space-between; margin-bottom:20px; }
@@ -31,10 +31,15 @@
         .no-border { border: none; }
         .small { font-size:11px; color:#555; }
 
-        /* Supaya tanda tangan fixed juga nggak mepet */
+        /* Sisihkan ruang bawah supaya tanda tangan gak mepet/nimpa */
+        .footer-space {
+            height: 130px; /* atur kalau masih kurang */
+        }
+
+        /* Tanda tangan: fixed tapi dinaikkan dari bawah */
         .signature {
             position: fixed;
-            bottom: 24px;
+            bottom: 60px;   /* <-- ini bikin "Dengan Hormat," nggak mepet bawah */
             right: 28px;
             text-align: center;
         }
@@ -123,6 +128,9 @@
                 <div class="small">Bank Mandiri<br>Norek : 1250056000086<br>Atas Nama : KOPERASI KARYAWAN PT</div>
             </div>
         </div>
+
+        <!-- ruang kosong biar konten gak nabrak signature -->
+        <div class="footer-space"></div>
 
         <div class="signature">
             <div>Dengan Hormat,</div>
