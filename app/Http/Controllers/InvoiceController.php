@@ -201,7 +201,7 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         $invoice->load('items');
-        return view('invoice.edit', compact('invoice'));
+        return view('invoice.create', compact('invoice'));
     }
 
     public function update(Request $request, Invoice $invoice)

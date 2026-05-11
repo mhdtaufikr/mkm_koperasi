@@ -1,8 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $isEdit = isset($invoice);
+@endphp
 <div class="container">
-    <h3>Buat Invoice</h3>
+    <h3>{{ $isEdit ? 'Edit Invoice' : 'Buat Invoice' }}</h3>
 
     @if($errors->any())
         <div class="alert alert-danger">
@@ -10,8 +13,11 @@
         </div>
     @endif
 
-    <form action="{{ route('invoice.store') }}" method="POST" id="invoiceForm">
+    <form action="{{ $isEdit ? route('invoice.update', $invoice) : route('invoice.store') }}" method="POST" id="invoiceForm">
         @csrf
+        @if($isEdit)
+            @method('PUT')
+        @endif
 
         {{-- ===================== HEADER INVOICE ===================== --}}
         <div class="card mb-3 p-3">
@@ -19,45 +25,45 @@
             <div class="row">
                 <div class="col-md-6 mb-2">
                     <label>Client</label>
-                    <input type="text" name="client" class="form-control" value="{{ old('client') }}" required>
+                    <input type="text" name="client" class="form-control" value="{{ old('client', $invoice->client ?? '') }}" required>
                 </div>
 
                 <div class="col-md-6 mb-2">
                     <label>PIC</label>
-                    <input type="text" name="pic" class="form-control" value="{{ old('pic') }}">
+                    <input type="text" name="pic" class="form-control" value="{{ old('pic', $invoice->pic ?? '') }}">
                 </div>
 
                 <div class="col-md-6 mb-2">
                     <label>No PO</label>
-                    <input type="text" name="no_po" class="form-control" value="{{ old('no_po') }}">
+                    <input type="text" name="no_po" class="form-control" value="{{ old('no_po', $invoice->no_po ?? '') }}">
                 </div>
                 <div class="col-md-6 mb-2">
                     <label>No Invoice (biarkan kosong untuk generate otomatis)</label>
-                    <input type="text" name="no_invoice" class="form-control" value="{{ old('no_invoice') }}">
+                    <input type="text" name="no_invoice" class="form-control" value="{{ old('no_invoice', $invoice->no_invoice ?? '') }}">
                 </div>
 
                 <div class="col-md-6 mb-2">
                     <label>Tanggal Terbit</label>
-                    <input type="date" name="tanggal_terbit" class="form-control" value="{{ old('tanggal_terbit', date('Y-m-d')) }}">
+                    <input type="date" name="tanggal_terbit" class="form-control" value="{{ old('tanggal_terbit', $isEdit && $invoice->tanggal_terbit ? $invoice->tanggal_terbit->format('Y-m-d') : date('Y-m-d')) }}">
                 </div>
                 <div class="col-md-6 mb-2">
                     <label>Tanggal Jatuh Tempo</label>
-                    <input type="date" name="tanggal_jatuh_tempo" class="form-control" value="{{ old('tanggal_jatuh_tempo') }}">
+                    <input type="date" name="tanggal_jatuh_tempo" class="form-control" value="{{ old('tanggal_jatuh_tempo', $isEdit && $invoice->tanggal_jatuh_tempo ? $invoice->tanggal_jatuh_tempo->format('Y-m-d') : '') }}">
                 </div>
 
                 <div class="col-md-6 mb-2">
                     <label>Tujuan Pembayaran</label>
-                    <input type="text" name="tujuan_pembayaran" class="form-control" value="{{ old('tujuan_pembayaran') }}">
+                    <input type="text" name="tujuan_pembayaran" class="form-control" value="{{ old('tujuan_pembayaran', $invoice->tujuan_pembayaran ?? '') }}">
                 </div>
 
                 <div class="col-md-6 mb-2">
                     <label>Tertanda</label>
-                    <input type="text" name="tertanda" class="form-control" value="{{ old('tertanda') }}">
+                    <input type="text" name="tertanda" class="form-control" value="{{ old('tertanda', $invoice->tertanda ?? '') }}">
                 </div>
 
                 <div class="col-md-12 mb-2">
                     <label>Notes</label>
-                    <textarea name="notes" class="form-control">{{ old('notes') }}</textarea>
+                    <textarea name="notes" class="form-control">{{ old('notes', $invoice->notes ?? '') }}</textarea>
                 </div>
             </div>
         </div>
@@ -68,7 +74,20 @@
 
             <div id="items">
                 @php
-                    $oldItems = old('items', [
+                    $invoiceItems = $isEdit
+                        ? $invoice->items->map(function ($item) {
+                            return [
+                                'description'   => $item->description,
+                                'quantity'      => $item->quantity,
+                                'quantity_unit' => $item->quantity_unit,
+                                'price'         => $item->price,
+                                'discount'      => $item->discount,
+                                'gross_up'      => $item->gross_up,
+                            ];
+                        })->toArray()
+                        : [];
+
+                    $oldItems = old('items', $invoiceItems ?: [
                         [
                             'description'   => '',
                             'quantity'      => 1,
@@ -173,14 +192,14 @@
         </div>
 
         {{-- ===================== HIDDEN TOTALS UNTUK CONTROLLER ===================== --}}
-        <input type="hidden" name="subtotal" value="{{ old('subtotal', 0) }}">
+        <input type="hidden" name="subtotal" value="{{ old('subtotal', $invoice->subtotal ?? 0) }}">
         <input type="hidden" name="gross_up_total" value="{{ old('gross_up_total', 0) }}">
-        <input type="hidden" name="discount_total" value="{{ old('discount_total', 0) }}">
-        <input type="hidden" name="tax_total" value="{{ old('tax_total', 0) }}">
+        <input type="hidden" name="discount_total" value="{{ old('discount_total', $invoice->discount_total ?? 0) }}">
+        <input type="hidden" name="tax_total" value="{{ old('tax_total', $invoice->tax_total ?? 0) }}">
         <input type="hidden" name="pph23_total" value="{{ old('pph23_total', 0) }}">
-        <input type="hidden" name="total" value="{{ old('total', 0) }}">
+        <input type="hidden" name="total" value="{{ old('total', $invoice->total ?? 0) }}">
 
-        <button class="btn btn-primary">Simpan Invoice</button>
+        <button class="btn btn-primary">{{ $isEdit ? 'Update Invoice' : 'Simpan Invoice' }}</button>
     </form>
 </div>
 @endsection
