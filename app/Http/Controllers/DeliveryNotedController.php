@@ -48,6 +48,16 @@ class DeliveryNotedController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'delivery_note_no' => 'required|string|max:255',
+            'delivery_date' => 'required|date',
+            'items' => 'required|array|min:1',
+            'items.*.item_name' => 'required|string|max:255',
+            'items.*.quantity' => 'required|numeric|min:0',
+            'items.*.unit' => 'required|string|max:255',
+            'items.*.description' => 'nullable|string',
+        ]);
+
         try {
             DB::beginTransaction();
 
@@ -115,6 +125,15 @@ class DeliveryNotedController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'delivery_date' => 'required|date',
+            'items' => 'required|array|min:1',
+            'items.*.item_name' => 'required|string|max:255',
+            'items.*.quantity' => 'required|numeric|min:0',
+            'items.*.unit' => 'required|string|max:255',
+            'items.*.description' => 'nullable|string',
+        ]);
+
         try {
             DB::beginTransaction();
 

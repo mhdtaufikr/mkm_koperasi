@@ -196,7 +196,8 @@
     <script>
         $.ajaxSetup({
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Accept': 'application/json'
             }
         });
 
@@ -337,7 +338,23 @@
                     }
                 },
                 error: function(xhr) {
-                    Swal.fire('Error!', 'Terjadi kesalahan', 'error');
+                    let message = 'Terjadi kesalahan';
+
+                    if (xhr.responseJSON) {
+                        if (xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                        } else if (xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                    } else if (xhr.responseText) {
+                        message = xhr.responseText;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        html: message
+                    });
                 }
             });
         });
