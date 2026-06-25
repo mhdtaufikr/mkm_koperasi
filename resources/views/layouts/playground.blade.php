@@ -20,6 +20,8 @@
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
     <div class="min-h-screen">
+        @hasSection('fullscreen')
+        @else
         <nav class="border-b border-slate-200 bg-white/90 backdrop-blur">
             <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                 <a href="{{ route('playground.upload') }}" class="flex items-center gap-3">
@@ -43,8 +45,9 @@
                 </div>
             </div>
         </nav>
+        @endif
 
-        <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <main class="@hasSection('fullscreen') w-full p-2 @else mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 @endif">
             @if(request()->query('saved'))
                 <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
                     Data raw berhasil diproses.
