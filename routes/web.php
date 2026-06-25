@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CoopDashboardUpdateController;
 use App\Http\Controllers\CoopDashboardController;
+use App\Http\Controllers\PlaygroundDashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DeliveryNotedController;
 
@@ -20,6 +21,14 @@ use App\Http\Controllers\DeliveryNotedController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::redirect('/playground', '/playgorund');
+Route::prefix('playgorund')->name('playground.')->group(function () {
+    Route::get('/', [PlaygroundDashboardController::class, 'upload'])->name('upload');
+    Route::post('/upload', [PlaygroundDashboardController::class, 'store'])->name('store');
+    Route::get('/dashboard', [PlaygroundDashboardController::class, 'dashboard'])->name('dashboard');
+});
+
 // routes/web.php (atau api.php jika mau pure JSON)
 Route::get('/api/coop-dashboard', [CoopDashboardController::class, 'index']);
 // routes/web.php
@@ -55,4 +64,3 @@ Route::prefix('delivery-note')->name('delivery-note.')->group(function () {
     Route::get('/{id}/pdf', [DeliveryNotedController::class, 'generatePDF'])->name('pdf');
     Route::get('/{id}/detail', [DeliveryNotedController::class, 'detail'])->name('detail');
 });
-

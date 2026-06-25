@@ -19,6 +19,7 @@
         </div>
 
         <form method="POST" action="{{ route('playground.store') }}" class="space-y-5">
+            @csrf
             <textarea name="raw_data" rows="19" class="w-full rounded-lg border border-slate-300 bg-slate-50 p-4 font-mono text-sm leading-6 text-slate-800 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100">{{ $rawData }}</textarea>
 
             <div class="grid gap-4 md:grid-cols-2">
