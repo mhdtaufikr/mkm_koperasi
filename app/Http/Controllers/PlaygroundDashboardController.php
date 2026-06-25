@@ -20,21 +20,31 @@ class PlaygroundDashboardController extends Controller
 
     public function store(Request $request)
     {
-        $rawData = trim((string) $request->input('raw_data', '')) ?: $this->defaultRawData();
+        $request->validate([
+            'dashboard_file' => ['nullable', 'file', 'max:4096'],
+        ]);
+
+        $rawData = $request->hasFile('dashboard_file')
+            ? $this->readUploadedFile($request->file('dashboard_file'))
+            : trim((string) $request->input('raw_data', ''));
+
+        $rawData = $rawData ?: $this->defaultRawData();
         $payload = $this->parseRawData($rawData);
 
-        $payload['participation'] = [
-            'pertokoan' => [
-                'label' => 'Pertokoan',
-                'active' => $this->positiveInt($request->input('pertokoan_active')),
-                'total' => $this->positiveInt($request->input('pertokoan_total')),
-            ],
-            'pinjaman' => [
-                'label' => 'Pinjaman',
-                'active' => $this->positiveInt($request->input('pinjaman_active')),
-                'total' => $this->positiveInt($request->input('pinjaman_total')),
-            ],
-        ];
+        if (!$request->hasFile('dashboard_file')) {
+            $payload['participation'] = [
+                'pertokoan' => [
+                    'label' => 'Pertokoan',
+                    'active' => $this->positiveInt($request->input('pertokoan_active')),
+                    'total' => $this->positiveInt($request->input('pertokoan_total')),
+                ],
+                'pinjaman' => [
+                    'label' => 'Pinjaman',
+                    'active' => $this->positiveInt($request->input('pinjaman_active')),
+                    'total' => $this->positiveInt($request->input('pinjaman_total')),
+                ],
+            ];
+        }
 
         foreach ($payload['participation'] as $key => $item) {
             $payload['participation'][$key]['rate'] = $item['total'] > 0
@@ -45,6 +55,16 @@ class PlaygroundDashboardController extends Controller
         $this->savePayload($payload);
 
         return redirect()->route('playground.dashboard', ['saved' => 1]);
+    }
+
+    public function template()
+    {
+        $filename = 'template-dashboard-rasio-keuangan.xls';
+
+        return response($this->defaultRawDataWithParticipation(), 200, [
+            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     public function dashboard()
@@ -198,6 +218,7 @@ class PlaygroundDashboardController extends Controller
         $tables = $this->extractTables($rawData);
         $ratios = [];
         $financials = [];
+        $participation = [];
 
         foreach ($tables as $table) {
             if (empty($table)) {
@@ -214,6 +235,10 @@ class PlaygroundDashboardController extends Controller
             if (strpos($headerText, 'keterangan') !== false) {
                 $financials = $this->parseFinancials($table);
             }
+
+            if (strpos($headerText, 'partisipasi') !== false || (strpos($headerText, 'aktif') !== false && strpos($headerText, 'total') !== false)) {
+                $participation = $this->parseParticipation($table);
+            }
         }
 
         $payload = [
@@ -225,6 +250,10 @@ class PlaygroundDashboardController extends Controller
                 'pinjaman' => ['label' => 'Pinjaman', 'active' => 0, 'total' => 0, 'rate' => 0],
             ],
         ];
+
+        if (!empty($participation)) {
+            $payload['participation'] = array_replace($payload['participation'], $participation);
+        }
 
         $payload['summary'] = $this->buildSummary($payload['ratios'], $payload['financials']);
         $payload['insights'] = $this->buildInsights($payload['ratios'], $payload['financials']);
@@ -310,6 +339,99 @@ class PlaygroundDashboardController extends Controller
         }
 
         return $rows;
+    }
+
+    private function parseParticipation(array $table): array
+    {
+        $rows = [];
+
+        foreach (array_slice($table, 1) as $row) {
+            if (count($row) < 3 || stripos($row[0], 'kategori') !== false) {
+                continue;
+            }
+
+            $label = trim($row[0]);
+            $key = strtolower($label) === 'pinjaman' ? 'pinjaman' : 'pertokoan';
+            $active = $this->positiveInt($this->parseNumber($row[1]));
+            $total = $this->positiveInt($this->parseNumber($row[2]));
+
+            $rows[$key] = [
+                'label' => ucfirst($key),
+                'active' => $active,
+                'total' => $total,
+                'rate' => $total > 0 ? round($active / $total * 100, 2) : 0,
+            ];
+        }
+
+        return $rows;
+    }
+
+    private function readUploadedFile($file): string
+    {
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        if ($extension === 'xlsx') {
+            return $this->readXlsx($file->getRealPath());
+        }
+
+        return trim((string) file_get_contents($file->getRealPath()));
+    }
+
+    private function readXlsx(string $path): string
+    {
+        if (!class_exists(\ZipArchive::class)) {
+            return '';
+        }
+
+        $zip = new \ZipArchive();
+        if ($zip->open($path) !== true) {
+            return '';
+        }
+
+        $sharedStrings = [];
+        $sharedXml = $zip->getFromName('xl/sharedStrings.xml');
+        if ($sharedXml !== false) {
+            $xml = simplexml_load_string($sharedXml);
+            foreach ($xml->si ?? [] as $item) {
+                $parts = [];
+                if (isset($item->t)) {
+                    $parts[] = (string) $item->t;
+                }
+                foreach ($item->r ?? [] as $run) {
+                    $parts[] = (string) $run->t;
+                }
+                $sharedStrings[] = implode('', $parts);
+            }
+        }
+
+        $sheetXml = $zip->getFromName('xl/worksheets/sheet1.xml');
+        $zip->close();
+
+        if ($sheetXml === false) {
+            return '';
+        }
+
+        $xml = simplexml_load_string($sheetXml);
+        $lines = [];
+
+        foreach ($xml->sheetData->row ?? [] as $row) {
+            $cells = [];
+            foreach ($row->c ?? [] as $cell) {
+                $type = (string) $cell['t'];
+                $value = (string) $cell->v;
+
+                if ($type === 's') {
+                    $value = $sharedStrings[(int) $value] ?? '';
+                } elseif ($type === 'inlineStr') {
+                    $value = (string) $cell->is->t;
+                }
+
+                $cells[] = $value;
+            }
+            $lines[] = implode("\t", $cells);
+        }
+
+        return trim(implode("\n", $lines));
     }
 
     private function parsePercent(string $value): float
@@ -426,6 +548,15 @@ Laba Kotor	1.555.561.976	1.808.817.977
 Laba Usaha	579.434.671	758.730.805
 Beban Pokok + Operasional	976.127.304	1.050.087.172
 Laba Bersih Tahun Berjalan	602.841.058	686.721.098
+RAW;
+    }
+
+    private function defaultRawDataWithParticipation(): string
+    {
+        return $this->defaultRawDataWithoutRecursion() . "\n\n" . <<<'RAW'
+Kategori Partisipasi	Aktif	Total
+Pertokoan	145	220
+Pinjaman	128	220
 RAW;
     }
 

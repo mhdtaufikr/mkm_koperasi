@@ -94,8 +94,16 @@
         <header class="panel xl:col-span-3 overflow-hidden">
             <div class="grid gap-2 p-3 xl:grid-cols-[1.15fr_0.82fr_0.72fr] xl:items-center">
                 <div>
-                    <h1 class="text-3xl font-black leading-none tracking-tight text-blue-950 md:text-4xl">DASHBOARD RASIO KEUANGAN</h1>
-                    <p class="mt-1 text-lg font-semibold text-slate-600">Perbandingan Kinerja Keuangan 2025 vs 2024</p>
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <h1 class="text-3xl font-black leading-none tracking-tight text-blue-950 md:text-4xl">DASHBOARD RASIO KEUANGAN</h1>
+                            <p class="mt-1 text-lg font-semibold text-slate-600">Perbandingan Kinerja Keuangan 2025 vs 2024</p>
+                        </div>
+                        <a href="{{ route('playground.upload') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-950 px-4 py-2 text-xs font-black text-white shadow-sm hover:bg-blue-800">
+                            <i data-lucide="upload-cloud" class="h-4 w-4"></i>
+                            Upload Data
+                        </a>
+                    </div>
                 </div>
                 <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2">
                     <div class="flex items-center gap-3">
@@ -277,6 +285,30 @@
 
             <section class="panel p-3">
                 <div class="mb-2 flex items-center gap-2">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-700 text-white"><i data-lucide="users-round" class="h-5 w-5"></i></span>
+                    <h2 class="font-black text-cyan-800">AKTIVITAS ANGGOTA</h2>
+                </div>
+                <div class="grid grid-cols-[0.95fr_1fr] gap-3">
+                    <div class="space-y-2">
+                        @foreach($participation as $item)
+                            <div class="rounded-lg border border-slate-200 bg-slate-50 p-2">
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-xs font-black text-blue-900">{{ strtoupper($item['label']) }}</p>
+                                    <span class="rounded bg-cyan-100 px-2 py-1 tiny font-black text-cyan-800">{{ $percent($item['rate']) }}</span>
+                                </div>
+                                <p class="mt-1 tiny font-semibold text-slate-600">{{ number_format($item['active'], 0, ',', '.') }} aktif dari {{ number_format($item['total'], 0, ',', '.') }} anggota</p>
+                                <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-200">
+                                    <div class="h-2 rounded-full bg-cyan-600" style="width: {{ min(100, $item['rate']) }}%"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mini-chart"><canvas id="memberActivityChart"></canvas></div>
+                </div>
+            </section>
+
+            <section class="panel p-3">
+                <div class="mb-2 flex items-center gap-2">
                     <span class="flex h-9 w-9 items-center justify-center rounded-full bg-green-700 text-white"><i data-lucide="chart-no-axes-combined" class="h-5 w-5"></i></span>
                     <h2 class="font-black text-blue-800">IV. PROFITABILITAS</h2>
                 </div>
@@ -374,6 +406,7 @@
 <script>
     const ratioRows = @json($ratios);
     const financialRows = @json($financials);
+    const participationRows = @json(array_values($participation));
 
     const formatIDR = (value) => new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -415,6 +448,35 @@
         @foreach([$gpm, $oir, $or, $npm] as $idx => $row)
             tinyBar('profit{{ $idx }}', [{{ $row['value_2024'] }}, {{ $row['value_2025'] }}], ['#cfe9d8', '#00833e']);
         @endforeach
+
+        new Chart(document.getElementById('memberActivityChart'), {
+            type: 'doughnut',
+            data: {
+                labels: participationRows.map((row) => row.label),
+                datasets: [{
+                    data: participationRows.map((row) => row.rate),
+                    backgroundColor: ['#0891b2', '#f97316'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '58%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const row = participationRows[ctx.dataIndex];
+                                return `${row.label}: ${formatPercent(row.rate)} (${row.active}/${row.total})`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
         const mainRows = financialRows.filter((row) => ['Pendapatan', 'Laba Bersih Tahun Berjalan'].includes(row.label));
         new Chart(document.getElementById('financialChart'), {
