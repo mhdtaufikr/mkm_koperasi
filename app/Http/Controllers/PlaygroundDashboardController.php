@@ -129,6 +129,8 @@ class PlaygroundDashboardController extends Controller
             return $this->defaultPayload();
         }
 
+        $years = $this->detectYears($rawData);
+
         return [
             'raw_data' => $rawData,
             'ratios' => $ratios,
@@ -136,6 +138,8 @@ class PlaygroundDashboardController extends Controller
             'participation' => array_replace($this->defaultPayload()['participation'], $participation),
             'summary' => $this->buildSummary($ratios, $financials),
             'insights' => $this->buildInsights($ratios, $financials),
+            'current_year' => $years['current'],
+            'previous_year' => $years['previous'],
         ];
     }
 
@@ -209,6 +213,41 @@ class PlaygroundDashboardController extends Controller
             && Schema::hasTable('playground_participations');
     }
 
+    private function detectYears(string $rawData): array
+    {
+        $tables = $this->extractTables($rawData);
+        foreach ($tables as $table) {
+            if (empty($table)) {
+                continue;
+            }
+
+            $header = array_map(fn ($value) => strtolower(trim($value)), $table[0]);
+            $headerText = implode(' ', $header);
+
+            if (strpos($headerText, 'kategori') !== false && strpos($headerText, 'rasio') !== false) {
+                if (isset($table[0][2]) && isset($table[0][3])) {
+                    $year1 = trim($table[0][2]);
+                    $year2 = trim($table[0][3]);
+                    if (preg_match('/^\d{4}$/', $year1) && preg_match('/^\d{4}$/', $year2)) {
+                        return ['current' => $year1, 'previous' => $year2];
+                    }
+                }
+            }
+
+            if (strpos($headerText, 'keterangan') !== false) {
+                if (isset($table[0][1]) && isset($table[0][2])) {
+                    $year1 = trim($table[0][1]);
+                    $year2 = trim($table[0][2]);
+                    if (preg_match('/^\d{4}$/', $year1) && preg_match('/^\d{4}$/', $year2)) {
+                        return ['current' => $year1, 'previous' => $year2];
+                    }
+                }
+            }
+        }
+
+        return ['current' => '2025', 'previous' => '2024'];
+    }
+
     private function positiveInt($value): int
     {
         return max(0, (int) $value);
@@ -242,6 +281,8 @@ class PlaygroundDashboardController extends Controller
             }
         }
 
+        $years = $this->detectYears($rawData);
+
         $payload = [
             'raw_data' => $rawData,
             'ratios' => $ratios,
@@ -250,6 +291,8 @@ class PlaygroundDashboardController extends Controller
                 'pertokoan' => ['label' => 'Pertokoan', 'active' => 0, 'total' => 0, 'rate' => 0],
                 'pinjaman' => ['label' => 'Pinjaman', 'active' => 0, 'total' => 0, 'rate' => 0],
             ],
+            'current_year' => $years['current'],
+            'previous_year' => $years['previous'],
         ];
 
         if (!empty($participation)) {
@@ -516,6 +559,10 @@ class PlaygroundDashboardController extends Controller
             'pertokoan' => ['label' => 'Pertokoan', 'active' => 145, 'total' => 220, 'rate' => 65.91],
             'pinjaman' => ['label' => 'Pinjaman', 'active' => 128, 'total' => 220, 'rate' => 58.18],
         ];
+        
+        $years = $this->detectYears($payload['raw_data']);
+        $payload['current_year'] = $years['current'];
+        $payload['previous_year'] = $years['previous'];
 
         return $payload;
     }

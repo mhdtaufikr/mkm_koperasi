@@ -132,7 +132,7 @@
                         <span class="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs font-black text-emerald-200">{{ $riskLevel }}</span>
                     </div>
                     <h1 class="mt-4 text-4xl font-black leading-none tracking-tight text-white md:text-6xl">FUTURISTIC<br>FINANCIAL REPORT</h1>
-                    <p class="mt-4 max-w-3xl text-sm font-semibold leading-6 text-slate-300">Executive cockpit rasio keuangan 2025 vs 2024. Semua panel membaca data dari database playground dan siap berubah setelah import Excel.</p>
+                    <p class="mt-4 max-w-3xl text-sm font-semibold leading-6 text-slate-300">Executive cockpit rasio keuangan {{ $current_year }} vs {{ $previous_year }}. Semua panel membaca data dari database playground dan siap berubah setelah import Excel.</p>
                 </div>
 
                 <div class="glass-soft rounded-xl p-4 neon-cyan">
@@ -166,11 +166,11 @@
 
         <section class="xl:col-span-3 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
             @foreach([
-                ['icon' => 'radio-tower', 'label' => 'Revenue Signal', 'value' => $shortMoney($revenue['value_2025']), 'change' => $revenueChange, 'sub' => '2024: ' . $shortMoney($revenue['value_2024']), 'tone' => 'cyan'],
-                ['icon' => 'landmark', 'label' => 'Asset Base', 'value' => $shortMoney($assets['value_2025']), 'change' => $assetChange, 'sub' => '2024: ' . $shortMoney($assets['value_2024']), 'tone' => 'blue'],
-                ['icon' => 'circle-dollar-sign', 'label' => 'Operating Profit', 'value' => $shortMoney($operatingProfit['value_2025']), 'change' => $operatingProfitChange, 'sub' => '2024: ' . $shortMoney($operatingProfit['value_2024']), 'tone' => 'emerald'],
-                ['icon' => 'orbit', 'label' => 'Net Profit', 'value' => $shortMoney($netProfit['value_2025']), 'change' => $netProfitChange, 'sub' => '2024: ' . $shortMoney($netProfit['value_2024']), 'tone' => 'amber'],
-                ['icon' => 'percent', 'label' => 'Net Margin', 'value' => $percent($npm['value_2025']), 'change' => $npm['diff'], 'sub' => '2024: ' . $percent($npm['value_2024']), 'tone' => 'violet'],
+                ['icon' => 'radio-tower', 'label' => 'Revenue Signal', 'value' => $shortMoney($revenue['value_2025']), 'change' => $revenueChange, 'sub' => $previous_year . ': ' . $shortMoney($revenue['value_2024']), 'tone' => 'cyan'],
+                ['icon' => 'landmark', 'label' => 'Asset Base', 'value' => $shortMoney($assets['value_2025']), 'change' => $assetChange, 'sub' => $previous_year . ': ' . $shortMoney($assets['value_2024']), 'tone' => 'blue'],
+                ['icon' => 'circle-dollar-sign', 'label' => 'Operating Profit', 'value' => $shortMoney($operatingProfit['value_2025']), 'change' => $operatingProfitChange, 'sub' => $previous_year . ': ' . $shortMoney($operatingProfit['value_2024']), 'tone' => 'emerald'],
+                ['icon' => 'orbit', 'label' => 'Net Profit', 'value' => $shortMoney($netProfit['value_2025']), 'change' => $netProfitChange, 'sub' => $previous_year . ': ' . $shortMoney($netProfit['value_2024']), 'tone' => 'amber'],
+                ['icon' => 'percent', 'label' => 'Net Margin', 'value' => $percent($npm['value_2025']), 'change' => $npm['diff'], 'sub' => $previous_year . ': ' . $percent($npm['value_2024']), 'tone' => 'violet'],
             ] as $metric)
                 <article class="glass relative overflow-hidden rounded-xl p-4 scan-card">
                     <div class="relative z-10 flex items-start justify-between gap-4">
@@ -266,7 +266,7 @@
                 <div class="mb-4 flex items-center justify-between">
                     <div>
                         <p class="text-xs font-black uppercase tracking-[.2em] text-violet-200">Ratio Navigation</p>
-                        <h2 class="text-2xl font-black text-white">Trend Matrix 2024 → 2025</h2>
+                        <h2 class="text-2xl font-black text-white">Trend Matrix {{ $previous_year }} → {{ $current_year }}</h2>
                     </div>
                     <i data-lucide="scan-line" class="h-8 w-8 text-violet-200"></i>
                 </div>
@@ -346,11 +346,11 @@
                                     </div>
                                     <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
                                         <div>
-                                            <p class="font-black text-slate-500">2025</p>
+                                            <p class="font-black text-slate-500">{{ $current_year }}</p>
                                             <p class="text-lg font-black text-white">{{ $percent($row['value_2025']) }}</p>
                                         </div>
                                         <div>
-                                            <p class="font-black text-slate-500">2024</p>
+                                            <p class="font-black text-slate-500">{{ $previous_year }}</p>
                                             <p class="text-lg font-black text-slate-300">{{ $percent($row['value_2024']) }}</p>
                                         </div>
                                     </div>
@@ -387,8 +387,8 @@
             data: {
                 labels: mainRows.map((row) => row.label.replace(' Tahun Berjalan', '')),
                 datasets: [
-                    { label: '2025', data: mainRows.map((row) => row.value_2025), backgroundColor: 'rgba(34, 211, 238, .78)', borderColor: '#67e8f9', borderWidth: 1, borderRadius: 7 },
-                    { label: '2024', data: mainRows.map((row) => row.value_2024), backgroundColor: 'rgba(148, 163, 184, .35)', borderColor: '#94a3b8', borderWidth: 1, borderRadius: 7 }
+                    { label: '{{ $current_year }}', data: mainRows.map((row) => row.value_2025), backgroundColor: 'rgba(34, 211, 238, .78)', borderColor: '#67e8f9', borderWidth: 1, borderRadius: 7 },
+                    { label: '{{ $previous_year }}', data: mainRows.map((row) => row.value_2024), backgroundColor: 'rgba(148, 163, 184, .35)', borderColor: '#94a3b8', borderWidth: 1, borderRadius: 7 }
                 ]
             },
             options: {
@@ -398,9 +398,9 @@
                     if (!elements.length) return;
                     const item = elements[0];
                     const row = mainRows[item.index];
-                    const year = item.datasetIndex === 0 ? '2025' : '2024';
-                    const value = year === '2025' ? row.value_2025 : row.value_2024;
-                    const previous = year === '2025' ? row.value_2024 : row.value_2025;
+                    const year = item.datasetIndex === 0 ? '{{ $current_year }}' : '{{ $previous_year }}';
+                    const value = year === '{{ $current_year }}' ? row.value_2025 : row.value_2024;
+                    const previous = year === '{{ $current_year }}' ? row.value_2024 : row.value_2025;
                     const change = previous ? ((value - previous) / previous) * 100 : 0;
                     document.getElementById('barDetail').innerHTML = `
                         <div class="flex items-center gap-3">
@@ -408,7 +408,7 @@
                             <div>
                                 <p class="text-sm font-black text-cyan-100">${row.label} ${year}</p>
                                 <p class="text-2xl font-black text-white">${formatIDR(value)}</p>
-                                <p class="${change >= 0 ? 'text-emerald-300' : 'text-rose-300'} text-xs font-black">${formatPercent(change)} dibanding ${year === '2025' ? '2024' : '2025'}</p>
+                                <p class="${change >= 0 ? 'text-emerald-300' : 'text-rose-300'} text-xs font-black">${formatPercent(change)} dibanding ${year === '{{ $current_year }}' ? '{{ $previous_year }}' : '{{ $current_year }}'}</p>
                             </div>
                         </div>`;
                     if (window.lucide) window.lucide.createIcons();
@@ -429,8 +429,8 @@
             data: {
                 labels: ratioRows.map((row) => row.ratio),
                 datasets: [
-                    { label: '2025', data: ratioRows.map((row) => row.value_2025), borderColor: '#22d3ee', backgroundColor: 'rgba(34, 211, 238, .16)', pointBackgroundColor: '#67e8f9', pointRadius: 3 },
-                    { label: '2024', data: ratioRows.map((row) => row.value_2024), borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, .10)', pointBackgroundColor: '#fde68a', pointRadius: 3 }
+                    { label: '{{ $current_year }}', data: ratioRows.map((row) => row.value_2025), borderColor: '#22d3ee', backgroundColor: 'rgba(34, 211, 238, .16)', pointBackgroundColor: '#67e8f9', pointRadius: 3 },
+                    { label: '{{ $previous_year }}', data: ratioRows.map((row) => row.value_2024), borderColor: '#fbbf24', backgroundColor: 'rgba(251, 191, 36, .10)', pointBackgroundColor: '#fde68a', pointRadius: 3 }
                 ]
             },
             options: {
