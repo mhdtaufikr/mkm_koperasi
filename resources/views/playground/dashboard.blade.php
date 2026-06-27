@@ -175,7 +175,7 @@
                 <article class="glass relative overflow-hidden rounded-xl p-4 scan-card">
                     <div class="relative z-10 flex items-start justify-between gap-4">
                         <div>
-                            <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">{{ $metric['label'] }}</p>
+                            <p class="text-xs font-black uppercase tracking-[.18em] text-slate-400">{{ $metric['label'] }} ({{ $current_year }})</p>
                             <p class="mt-3 text-3xl font-black text-white">{{ $metric['value'] }}</p>
                             <p class="{{ $metric['change'] >= 0 ? 'text-emerald-300' : 'text-rose-300' }} mt-1 text-sm font-black">{{ $metric['change'] >= 0 ? '+' : '' }}{{ $percent($metric['change']) }}</p>
                             <p class="mt-1 text-xs font-semibold text-slate-400">{{ $metric['sub'] }}</p>
@@ -200,7 +200,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     @foreach([$currentRatio, $acidRatio] as $ratio)
                         <div class="rounded-xl border border-white/10 bg-white/5 p-3">
-                            <p class="text-xs font-black text-slate-400">{{ $ratio['ratio'] }}</p>
+                            <p class="text-xs font-black text-slate-400">{{ $ratio['ratio'] }} ({{ $current_year }})</p>
                             <p class="mt-2 text-3xl font-black text-white">{{ $percent($ratio['value_2025']) }}</p>
                             <p class="{{ $ratio['diff'] >= 0 ? 'text-emerald-300' : 'text-rose-300' }} text-xs font-black">{{ $ratio['diff'] >= 0 ? '+' : '' }}{{ $percent($ratio['diff']) }} p.p</p>
                             <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
@@ -291,7 +291,7 @@
                         ['label' => 'Ekuitas', 'value' => $equity],
                     ] as $item)
                         <div class="rounded-xl border border-white/10 bg-white/5 p-3 text-center">
-                            <p class="text-xs font-black text-slate-400">{{ $item['label'] }}</p>
+                            <p class="text-xs font-black text-slate-400">{{ $item['label'] }} ({{ $current_year }})</p>
                             <p class="mt-1 text-sm font-black text-white">{{ $shortMoney($item['value']['value_2025']) }}</p>
                         </div>
                     @endforeach
