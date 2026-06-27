@@ -185,13 +185,14 @@ class PlaygroundDashboardController extends Controller
                 );
             }
 
-            foreach ($payload['participation'] as $index => $item) {
+            $i = 1;
+            foreach ($payload['participation'] as $item) {
                 DB::table('playground_participations')->updateOrInsert(
                     ['category' => $item['label']],
                     [
                         'active_members' => $item['active'],
                         'total_members' => $item['total'],
-                        'sort_order' => $index + 1,
+                        'sort_order' => $i++,
                         'created_at' => $now,
                         'updated_at' => $now,
                     ]
