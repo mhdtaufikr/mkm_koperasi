@@ -225,9 +225,9 @@ class PlaygroundDashboardController extends Controller
             $headerText = implode(' ', $header);
 
             if (strpos($headerText, 'kategori') !== false && strpos($headerText, 'rasio') !== false) {
-                if (isset($table[0][2]) && isset($table[0][3])) {
-                    $year1 = trim($table[0][2]);
-                    $year2 = trim($table[0][3]);
+                if (isset($table[0][3]) && isset($table[0][4])) {
+                    $year1 = trim($table[0][3]);
+                    $year2 = trim($table[0][4]);
                     if (preg_match('/^\d{4}$/', $year1) && preg_match('/^\d{4}$/', $year2)) {
                         return ['current' => $year1, 'previous' => $year2];
                     }
@@ -235,9 +235,9 @@ class PlaygroundDashboardController extends Controller
             }
 
             if (strpos($headerText, 'keterangan') !== false) {
-                if (isset($table[0][1]) && isset($table[0][2])) {
-                    $year1 = trim($table[0][1]);
-                    $year2 = trim($table[0][2]);
+                if (isset($table[0][2]) && isset($table[0][3])) {
+                    $year1 = trim($table[0][2]);
+                    $year2 = trim($table[0][3]);
                     if (preg_match('/^\d{4}$/', $year1) && preg_match('/^\d{4}$/', $year2)) {
                         return ['current' => $year1, 'previous' => $year2];
                     }
@@ -357,8 +357,8 @@ class PlaygroundDashboardController extends Controller
             $rows[] = [
                 'category' => $row[0],
                 'ratio' => $row[1],
-                'value_2025' => $this->parsePercent($row[2]),
-                'value_2024' => $this->parsePercent($row[3]),
+                'value_2025' => $this->parsePercent($row[3]),
+                'value_2024' => $this->parsePercent($row[2]),
                 'diff' => $this->parsePercent($row[4]),
             ];
         }
@@ -377,8 +377,8 @@ class PlaygroundDashboardController extends Controller
 
             $rows[] = [
                 'label' => $row[0],
-                'value_2025' => $this->parseNumber($row[1]),
-                'value_2024' => $this->parseNumber($row[2]),
+                'value_2025' => $this->parseNumber($row[2]),
+                'value_2024' => $this->parseNumber($row[1]),
             ];
         }
 
@@ -390,14 +390,14 @@ class PlaygroundDashboardController extends Controller
         $rows = [];
 
         foreach (array_slice($table, 1) as $row) {
-            if (count($row) < 3 || stripos($row[0], 'kategori') !== false) {
+            if (count($row) < 4 || stripos($row[0], 'kategori') !== false) {
                 continue;
             }
 
             $label = trim($row[0]);
             $key = strtolower($label) === 'pinjaman' ? 'pinjaman' : 'pertokoan';
-            $active = $this->positiveInt($this->parseNumber($row[1]));
-            $total = $this->positiveInt($this->parseNumber($row[2]));
+            $active = $this->positiveInt($this->parseNumber($row[2]));
+            $total = $this->positiveInt($this->parseNumber($row[3]));
 
             $rows[$key] = [
                 'label' => ucfirst($key),
@@ -575,7 +575,7 @@ class PlaygroundDashboardController extends Controller
     private function defaultRawDataWithoutRecursion(): string
     {
         return <<<'RAW'
-Kategori	Rasio	2025	2024	Selisih
+Kategori	Rasio		2025	2024	Selisih
 Liquidity	Current Ratio	316.18%	289.57%	26.61%
 Liquidity	Acid Test Ratio	10.58%	22.23%	-11.65%
 Leverage	Debt to Equity Ratio	121.58%	159.15%	-37.57%
@@ -585,7 +585,7 @@ Profitability	Operating Income Ratio	10.03%	9.94%	0.09%
 Profitability	Operating Ratio	16.90%	13.76%	3.14%
 Profitability	Net Profit Margin	10.43%	9.00%	1.43%
 
-Keterangan	2025	2024
+Keterangan		2025	2024
 Aset Lancar	20.569.298.877	20.130.969.673
 Kewajiban Jangka Pendek	6.505.518.557	6.951.906.805
 Total Kewajiban	6.505.518.557	6.951.906.805
@@ -602,9 +602,9 @@ RAW;
     private function defaultRawDataWithParticipation(): string
     {
         return $this->defaultRawDataWithoutRecursion() . "\n\n" . <<<'RAW'
-Kategori Partisipasi	Aktif	Total
-Pertokoan	145	220
-Pinjaman	128	220
+Kategori Partisipasi		Aktif	Total
+Pertokoan		145	220
+Pinjaman		128	220
 RAW;
     }
 
